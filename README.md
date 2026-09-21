@@ -1,84 +1,48 @@
 # DevSecOps Java Monolith
 
-Este repositorio contiene una aplicación monolítica desarrollada en Java con Spring Boot, utilizada como proyecto práctico para demostrar la implementación de un proceso de Integración Continua y Entrega Continua utilizando Jenkins.
+Proyecto realizado como práctica final del curso de DevSecOps.
 
-
-## Descripción de la aplicación
-
-La aplicación consiste en un sistema sencillo de gestión de empleados desarrollado utilizando una arquitectura monolítica.
-
-Desde la aplicación es posible registrar, consultar, modificar y eliminar empleados.
-
-Cada empleado contiene información como:
-
-* Nombre.
-* Apellido.
-* Correo electrónico.
-* Puesto.
-* Salario.
-
-La aplicación utiliza Spring Boot como framework principal, Thymeleaf para la visualización de las páginas y Spring Data JPA para el acceso a datos.
-
-Para facilitar la ejecución del proyecto se utiliza una base de datos H2 en memoria, evitando la necesidad de instalar o configurar un servidor de base de datos adicional.
+La aplicación es un sistema monolítico desarrollado con Java, Spring Boot y Maven. Permite realizar operaciones básicas de gestión de empleados utilizando una base de datos H2.
 
 ## Tecnologías utilizadas
 
-El proyecto utiliza principalmente las siguientes tecnologías:
+* Java 17
+* Spring Boot
+* Maven
+* JUnit
+* Mockito
+* JaCoCo
+* Jenkins
+* SonarQube
+* JFrog Artifactory
+* Docker
+* Docker Compose
 
-* Java 17.
-* Spring Boot.
-* Maven.
-* Spring MVC.
-* Spring Data JPA.
-* Thymeleaf.
-* H2 Database.
-* JUnit 5.
-* Mockito.
-* JaCoCo.
-* Jenkins.
-* SonarQube.
-* JFrog Artifactory.
-* Docker.
-* Docker Compose.
-* Git.
-* GitHub.
+## Pipeline
 
-## Estructura general del proyecto
+El archivo `Jenkinsfile` ubicado en la raíz del proyecto contiene el pipeline utilizado para automatizar el proceso.
 
-La aplicación sigue una estructura tradicional por capas:
+El pipeline realiza las siguientes etapas:
 
-```text
-Controller
-    |
-    v
-Service
-    |
-    v
-Repository
-    |
-    v
-H2 Database
-```
+1. **Build**
+   Compila el proyecto utilizando Maven.
 
-El controlador recibe las solicitudes provenientes de la aplicación web.
+2. **Testing**
+   Ejecuta las pruebas unitarias desarrolladas con JUnit y Mockito.
 
-La capa de servicio contiene la lógica de negocio y funciona como intermediaria entre el controlador y el acceso a datos.
+3. **JaCoCo**
+   Genera el reporte de cobertura de código.
 
-La capa Repository utiliza Spring Data JPA para realizar las operaciones necesarias sobre la base de datos H2.
+4. **SonarQube**
+   Analiza la calidad del código y posibles problemas.
 
-Todo el sistema se encuentra contenido dentro de una misma aplicación, por lo que corresponde a una arquitectura monolítica.
+5. **Package**
+   Genera el archivo `.jar` de la aplicación.
 
-## Pipeline CI/CD
+6. **Artifactory**
+   El artefacto generado es enviado a JFrog Artifactory.
 
-En la raíz del repositorio se encuentra el archivo:
-
-```text
-Jenkinsfile
-```
-
-Este archivo contiene la definición del pipeline utilizado por Jenkins para automatizar la construcción, pruebas, análisis y generación del artefacto de la aplicación.
-
-El flujo implementado es el siguiente:
+El flujo general es:
 
 ```text
 GitHub
@@ -86,32 +50,70 @@ GitHub
    v
 Jenkins
    |
-   +---- Build
+   +-- Build
    |
-   +---- Testing
-   |       |
-   |       +---- JUnit
-   |       |
-   |       +---- JaCoCo
+   +-- Testing + JaCoCo
    |
-   +---- SonarQube
+   +-- SonarQube
    |
-   +---- Package
+   +-- Package
    |
-   +---- Verify Artifact
-   |
-   +---- Artifactory
+   +-- Artifactory
 ```
 
-## Stage Build
+## Docker
 
-El primer stage del pipeline se encarga de compilar el proyecto.
+Para realizar las pruebas del pipeline utilicé Docker de forma local.
 
-Jenkins utiliza Maven Wrapper, incluido dentro del repositorio, por medio del siguiente comando:
+Se utilizaron contenedores para:
+
+* Jenkins
+* SonarQube
+* PostgreSQL
+* JFrog Artifactory
+
+El archivo utilizado para levantar estos servicios se encuentra en:
+
+```text
+/resources/docker-compose.yml
+```
+
+Para levantar el ambiente se puede utilizar:
 
 ```bash
-./mvnw clean compile
+docker compose -f resources/docker-compose.yml up -d
 ```
 
-El uso de Maven Wrapper permite utilizar la versión de Maven definida para el proyecto sin depe
+## Ejecución del proyecto
 
+Para ejecutar la aplicación:
+
+```bash
+./mvnw spring-boot:run
+```
+
+La aplicación puede visualizarse en:
+
+```text
+http://localhost:8080/empleados
+```
+
+Para ejecutar las pruebas:
+
+```bash
+./mvnw clean test
+```
+
+Para generar el artefacto:
+
+```bash
+./mvnw clean package
+```
+
+El archivo `.jar` generado queda dentro de la carpeta:
+
+```text
+target/
+```
+
+Este proyecto fue realizado con fines de aprendizaje para practicar un flujo básico de Integración Continua y Entrega Continua utilizando herramientas DevSecOps.
